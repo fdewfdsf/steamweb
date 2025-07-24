@@ -128,7 +128,7 @@ h4#game-title-2 {
     const rawName = params.get("name") || "";
     const name = rawName.trim().toUpperCase();
 
-    fetch("data/games.json")
+fetch("/games")
 
       .then(res => res.json())
       .then(games => {
