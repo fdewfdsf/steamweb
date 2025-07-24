@@ -8,7 +8,7 @@ const dataPath = path.join(__dirname, 'DATA', 'games.json');
 
 app.use(express.json());
 app.use(express.static('public'));
-app.use(express.static(path.join(__dirname, 'DATA', 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 🟡 جلب كل الألعاب
 app.get('/games', (req, res) => {
