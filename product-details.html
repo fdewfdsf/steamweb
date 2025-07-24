@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Details</title>
+
+  <style>
+    body {
+      background-image: url('assets/images/BACKGROUND_IMAGE.png'); /* استبدل باسم الصورة الخلفية */
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
+    }
+
+    .page-heading {
+      background: none !important;
+      background-image: none !important;
+      background-color: transparent !important;
+      border-radius: 0 !important;
+      padding: 50px 0 !important;
+    }
+
+    #game-description {
+      font-size: 20px;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+/* حل مشكلة الرول */
+html, body {
+  height: 100%;
+}
+
+/* تمديد مساحة المحتوى */
+.single-product {
+  min-height: 70vh;
+  padding-bottom: 60px;
+}
+
+/* ظل لصورة اللعبة */
+.left-image img {
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+}
+
+/* تحسين وصف اللعبة */
+#game-description {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 15px;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+}
+
+/* تحسين شكل العنوان */
+h4#game-title-2 {
+  font-size: 28px;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+  </style>
+
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/fontawesome.css" />
+  <link rel="stylesheet" href="assets/css/templatemo-lugx-gaming.css" />
+  <link rel="stylesheet" href="assets/css/owl.css" />
+  <link rel="stylesheet" href="assets/css/animate.css" />
+</head>
+
+<body>
+  <header class="header-area header-sticky">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <nav class="main-nav">
+            <ul class="nav">
+              <li><a href="shop.html">Home</a></li>
+              <li><a href="contact.html">Contact Us</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-heading header-text">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3 id="game-title">اسم اللعبة</h3>
+          <span class="breadcrumb" id="breadcrumb-description" style="display: none;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="single-product section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="left-image">
+            <img id="game-image" src="" alt="Game Image" />
+          </div>
+        </div>
+        <div class="col-lg-6 align-self-center">
+          <h4 id="game-title-2" style="color: white;">اسم اللعبة</h4>
+<p id="game-description" style="color: white;">وصف اللعبة</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="col-lg-12">
+        <!-- فارغ بدون حقوق -->
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const rawName = params.get("name") || "";
+    const name = rawName.trim().toUpperCase();
+
+    fetch("DATA/games.json")
+      .then(res => res.json())
+      .then(games => {
+        const game = games.find(g => g.name.trim().toUpperCase() === name);
+        if (game) {
+          document.getElementById("game-title").textContent = game.name;
+          document.getElementById("game-title-2").textContent = game.name;
+          document.getElementById("game-description").textContent = game.description;
+          document.getElementById("breadcrumb-description").textContent = game.description;
+          document.getElementById("game-image").src = `assets/images/${game.image}`;
+          document.getElementById("game-image").alt = game.name;
+        } else {
+          document.getElementById("game-description").textContent = "وصف غير متوفر";
+        }
+      })
+      .catch(err => {
+        document.getElementById("game-description").textContent = "فشل تحميل البيانات";
+        console.error("خطأ في تحميل JSON:", err);
+      });
+  </script>
+
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/js/isotope.min.js"></script>
+  <script src="assets/js/owl-carousel.js"></script>
+  <script src="assets/js/counter.js"></script>
+  <script src="assets/js/custom.js"></script>
+</body>
+</html>
