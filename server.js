@@ -1,3 +1,4 @@
+
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -12,7 +13,7 @@ const dataPath = path.join(__dirname, 'DATA', 'games.json');
 
 // ✅ الصفحة الرئيسية
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });
 
 // ✅ قراءة الألعاب
@@ -23,7 +24,7 @@ app.get('/games', (req, res) => {
   });
 });
 
-// ✅ تعديل لعبة حسب index
+// ✅ تعديل لعبة بناءً على index
 app.put('/games/:index', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading file');
@@ -54,7 +55,7 @@ app.post('/games', (req, res) => {
   });
 });
 
-// ✅ حذف لعبة حسب index
+// ✅ حذف لعبة
 app.delete('/games/:index', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading file');
