@@ -12,5 +12,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fdewfdsf/steamweb.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fdewfdsf/steamweb/issues"
+  },
+  "homepage": "https://github.com/fdewfdsf/steamweb#readme",
   "description": ""
 }

@@ -1,14 +1,16 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const app = express();
-const PORT = process.env.PORT || 3000;
 
-const dataPath = path.join(__dirname, 'DATA', 'games.json');
+const app = express();
+const port = process.env.PORT || 3000;
+
+// 🔧 تقديم كل الملفات الثابتة: HTML, CSS, JS, vendor, assets
+app.use(express.static(__dirname));
 
 app.use(express.json());
-app.use(express.static('public'));
-app.use(express.static(path.join(__dirname, 'public')));
+
+const dataPath = path.join(__dirname, 'DATA', 'games.json');
 
 // 🟡 جلب كل الألعاب
 app.get('/games', (req, res) => {
@@ -54,11 +56,13 @@ app.post('/games', (req, res) => {
     });
   });
 });
+
+// 🏠 الصفحة الرئيسية
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 🟢 تشغيل السيرفر
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}/dashboard.html`);
+// ✅ تشغيل السيرفر
+app.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`);
 });
