@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Games Manager</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Games Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
   <style>
     body {
       background: linear-gradient(135deg, #000428, #004e92);
@@ -27,12 +27,6 @@
     .form-control, .btn {
       border-radius: 10px;
     }
-    label {
-      margin-top: 10px;
-    }
-    .tab-button {
-      margin: 5px;
-    }
     .game-list {
       max-height: 300px;
       overflow-y: auto;
@@ -47,8 +41,12 @@
     .game-item-content {
       flex: 1;
     }
-    .delete-btn {
-      margin-left: 15px;
+    .tab-button {
+      margin: 5px;
+    }
+    .alert-msg {
+      margin-top: 10px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -59,6 +57,7 @@
     <button class="btn btn-warning tab-button" onclick="showTab('add')">Add Game</button>
     <button class="btn btn-info tab-button" onclick="showTab('description')">Edit Descriptions</button>
     <button class="btn btn-info tab-button" onclick="showTab('images')">Edit Images</button>
+    <button class="btn btn-info tab-button" onclick="showTab('names')">Edit Names</button>
   </div>
 
   <div id="add" class="section">
@@ -67,7 +66,7 @@
     <input class="form-control mb-2" id="add-image" placeholder="Image Filename (e.g. game.jpg)">
     <textarea class="form-control mb-2" id="add-description" placeholder="Game Description"></textarea>
     <button class="btn btn-success" onclick="addGame()">Add Game</button>
-    <div id="add-msg" class="mt-2"></div>
+    <div id="add-msg" class="alert-msg text-success"></div>
   </div>
 
   <div id="description" class="section" style="display:none;">
@@ -80,6 +79,12 @@
     <h4>Edit Images</h4>
     <input class="form-control mb-3" placeholder="Search..." oninput="filterGames(this.value, 'img')">
     <div class="game-list" id="img-list"></div>
+  </div>
+
+  <div id="names" class="section" style="display:none;">
+    <h4>Edit Names</h4>
+    <input class="form-control mb-3" placeholder="Search..." oninput="filterGames(this.value, 'name')">
+    <div class="game-list" id="name-list"></div>
   </div>
 
   <script>
@@ -95,45 +100,65 @@
     }
 
     function renderGameLists() {
-      const descList = document.getElementById('desc-list');
-      const imgList = document.getElementById('img-list');
-      descList.innerHTML = imgList.innerHTML = '';
-      games.forEach((game, index) => {
-        descList.innerHTML += `
-          <div class="game-item">
-            <div class="game-item-content">
-              <strong>${game.name}</strong><br>
-              <textarea class="form-control" onchange="updateGame(${index}, 'description', this.value)">${game.description}</textarea>
-            </div>
-            <button class="btn btn-danger btn-sm delete-btn" onclick="deleteGame(${index})">Delete</button>
-          </div>`;
+      ['desc', 'img', 'name'].forEach(type => {
+        document.getElementById(type + '-list').innerHTML = '';
+      });
 
-        imgList.innerHTML += `
-          <div class="game-item">
-            <div class="game-item-content">
-              <strong>${game.name}</strong><br>
-              <input class="form-control" value="${game.image}" onchange="updateGame(${index}, 'image', this.value)">
-            </div>
-            <button class="btn btn-danger btn-sm delete-btn" onclick="deleteGame(${index})">Delete</button>
-          </div>`;
+      games.forEach((game, index) => {
+        renderItem('desc', index, game.name, game.description, 'description');
+        renderItem('img', index, game.name, game.image, 'image');
+        renderItem('name', index, game.name, game.name, 'name');
       });
     }
 
-    function updateGame(index, field, value) {
+    function renderItem(type, index, title, value, field) {
+      const container = document.getElementById(type + '-list');
+      const input = field === 'description'
+        ? `<textarea class="form-control" onchange="updateGame(${index}, '${field}', this.value, this)">${value}</textarea>`
+        : `<input class="form-control" value="${value}" onchange="updateGame(${index}, '${field}', this.value, this)">`;
+
+      container.innerHTML += `
+        <div class="game-item">
+          <div class="game-item-content">
+            <strong>${title}</strong><br>
+            ${input}
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="deleteGame(${index})">Delete</button>
+        </div>`;
+    }
+
+    function updateGame(index, field, value, element) {
       const updatedGame = { ...games[index], [field]: value };
       fetch(`/games/${index}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedGame)
       }).then(res => {
-        if (res.ok) fetchGames();
+        if (res.ok) {
+          showMessage(element, 'تم الحفظ ✅');
+          fetchGames();
+        }
       });
     }
 
+    function showMessage(el, msg) {
+      const div = document.createElement('div');
+      div.className = 'text-success alert-msg';
+      div.textContent = msg;
+      el.parentNode.appendChild(div);
+      setTimeout(() => div.remove(), 2000);
+    }
+
     function addGame() {
-      const name = document.getElementById('add-name').value;
-      const image = document.getElementById('add-image').value;
-      const description = document.getElementById('add-description').value;
+      const name = document.getElementById('add-name').value.trim();
+      const image = document.getElementById('add-image').value.trim();
+      const description = document.getElementById('add-description').value.trim();
+
+      if (!name || !image || !description) {
+        document.getElementById('add-msg').textContent = 'يرجى تعبئة كل الحقول';
+        return;
+      }
+
       fetch('/games', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -142,6 +167,9 @@
         .then(r => {
           if (r.success) {
             document.getElementById('add-msg').textContent = '✅ Game added!';
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-image').value = '';
+            document.getElementById('add-description').value = '';
             fetchGames();
           }
         });
@@ -151,36 +179,31 @@
       fetch(`/games/${index}`, {
         method: 'DELETE'
       }).then(res => {
-        if (res.ok) fetchGames();
+        if (res.ok) {
+          alert('🗑️ تم حذف اللعبة');
+          fetchGames();
+        }
       });
     }
 
     function filterGames(query, type) {
       query = query.toLowerCase();
-      const list = type === 'desc' ? 'desc-list' : 'img-list';
-      const container = document.getElementById(list);
+      const container = document.getElementById(type + '-list');
       container.innerHTML = '';
+
       games.forEach((game, index) => {
         if (game.name.toLowerCase().includes(query)) {
-          const content = type === 'desc' ?
-            `<textarea class="form-control" onchange="updateGame(${index}, 'description', this.value)">${game.description}</textarea>` :
-            `<input class="form-control" value="${game.image}" onchange="updateGame(${index}, 'image', this.value)">`;
-          container.innerHTML += `
-            <div class="game-item">
-              <div class="game-item-content">
-                <strong>${game.name}</strong><br>
-                ${content}
-              </div>
-              <button class="btn btn-danger btn-sm delete-btn" onclick="deleteGame(${index})">Delete</button>
-            </div>`;
+          const value = type === 'desc' ? game.description :
+                        type === 'img' ? game.image : game.name;
+          renderItem(type, index, game.name, value, type === 'name' ? 'name' : type);
         }
       });
     }
 
     function showTab(id) {
-      document.getElementById('add').style.display = 'none';
-      document.getElementById('description').style.display = 'none';
-      document.getElementById('images').style.display = 'none';
+      ['add', 'description', 'images', 'names'].forEach(tab => {
+        document.getElementById(tab).style.display = 'none';
+      });
       document.getElementById(id).style.display = 'block';
     }
 

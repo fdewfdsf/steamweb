@@ -23,7 +23,7 @@ app.get('/games', (req, res) => {
   });
 });
 
-// ✅ تعديل لعبة بناءً على index
+// ✅ تعديل لعبة حسب index
 app.put('/games/:index', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading file');
@@ -51,6 +51,24 @@ app.post('/games', (req, res) => {
       if (err) return res.status(500).send('Error writing file');
       res.json({ success: true });
     });
+  });
+});
+
+// ✅ حذف لعبة حسب index
+app.delete('/games/:index', (req, res) => {
+  fs.readFile(dataPath, 'utf8', (err, data) => {
+    if (err) return res.status(500).send('Error reading file');
+    let games = JSON.parse(data);
+    const index = parseInt(req.params.index);
+    if (index >= 0 && index < games.length) {
+      games.splice(index, 1);
+      fs.writeFile(dataPath, JSON.stringify(games, null, 2), 'utf8', err => {
+        if (err) return res.status(500).send('Error writing file');
+        res.json({ success: true });
+      });
+    } else {
+      res.status(400).send('Invalid game index');
+    }
   });
 });
 
