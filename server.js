@@ -10,12 +10,12 @@ app.use(express.json());
 
 const dataPath = path.join(__dirname, 'DATA', 'games.json');
 
-// الصفحة الرئيسية
+// ✅ الصفحة الرئيسية
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// قراءة الألعاب
+// ✅ قراءة الألعاب
 app.get('/games', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading games file');
@@ -23,7 +23,7 @@ app.get('/games', (req, res) => {
   });
 });
 
-// تعديل لعبة بناءً على index
+// ✅ تعديل لعبة بناءً على index
 app.put('/games/:index', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading file');
@@ -41,7 +41,7 @@ app.put('/games/:index', (req, res) => {
   });
 });
 
-// إضافة لعبة جديدة
+// ✅ إضافة لعبة جديدة
 app.post('/games', (req, res) => {
   fs.readFile(dataPath, 'utf8', (err, data) => {
     if (err) return res.status(500).send('Error reading file');
@@ -54,6 +54,7 @@ app.post('/games', (req, res) => {
   });
 });
 
+// ✅ تشغيل السيرفر
 app.listen(PORT, () => {
   console.log(`🚀 Dashboard running at http://localhost:${PORT}`);
 });
