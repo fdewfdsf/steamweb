@@ -14,12 +14,13 @@ app.get('/', (req, res) => {
 });
 
 // ✅ قراءة الألعاب
-app.get('/api/games', (req, res) => {
-  fs.readFile('games.json', 'utf8', (err, data) => {
-    if (err) return res.status(500).json({ error: 'Failed to read file' });
+app.get('/games', (req, res) => {
+  fs.readFile(path.join(__dirname, 'DATA', 'games.json'), 'utf8', (err, data) => {
+    if (err) return res.status(500).send('Error reading games file');
     res.json(JSON.parse(data));
   });
 });
+
 
 // ✅ حفظ التعديلات
 app.post('/api/games', (req, res) => {
