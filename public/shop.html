@@ -243,12 +243,12 @@
   <script>
     let allGames = [];
 
-    fetch('data/games.json')
-      .then(res => res.json())
-      .then(games => {
-        allGames = games;
-        renderGames(games);
-      });
+fetch('/games')
+  .then(res => res.json())
+  .then(games => {
+    allGames = games;
+    renderGames(games);
+  });
 
     function renderGames(games) {
       const container = document.getElementById("game-list");
