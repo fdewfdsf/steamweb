@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
   <style>
     body {
-      background: linear-gradient(135deg, #2c003e, #55009b);
+      background: linear-gradient(135deg, #000428, #004e92);
       color: #fff;
       font-family: 'Poppins', sans-serif;
       padding: 30px;
@@ -15,14 +15,14 @@
     h1 {
       text-align: center;
       margin-bottom: 30px;
-      color: #ffccff;
+      color: #ffdd00;
     }
     .section {
       background-color: rgba(255, 255, 255, 0.05);
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 30px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
     .form-control, .btn {
       border-radius: 10px;
@@ -40,6 +40,15 @@
     .game-item {
       padding: 10px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .game-item-content {
+      flex: 1;
+    }
+    .delete-btn {
+      margin-left: 15px;
     }
   </style>
 </head>
@@ -47,12 +56,11 @@
   <h1>Games Dashboard</h1>
 
   <div class="text-center mb-4">
-    <button class="btn btn-outline-light tab-button" onclick="showTab('add')">Add Game</button>
-    <button class="btn btn-outline-light tab-button" onclick="showTab('description')">Edit Descriptions</button>
-    <button class="btn btn-outline-light tab-button" onclick="showTab('images')">Edit Images</button>
+    <button class="btn btn-warning tab-button" onclick="showTab('add')">Add Game</button>
+    <button class="btn btn-info tab-button" onclick="showTab('description')">Edit Descriptions</button>
+    <button class="btn btn-info tab-button" onclick="showTab('images')">Edit Images</button>
   </div>
 
-  <!-- Add Game Section -->
   <div id="add" class="section">
     <h4>Add New Game</h4>
     <input class="form-control mb-2" id="add-name" placeholder="Game Name">
@@ -62,14 +70,12 @@
     <div id="add-msg" class="mt-2"></div>
   </div>
 
-  <!-- Edit Descriptions Section -->
   <div id="description" class="section" style="display:none;">
     <h4>Edit Descriptions</h4>
     <input class="form-control mb-3" placeholder="Search..." oninput="filterGames(this.value, 'desc')">
     <div class="game-list" id="desc-list"></div>
   </div>
 
-  <!-- Edit Images Section -->
   <div id="images" class="section" style="display:none;">
     <h4>Edit Images</h4>
     <input class="form-control mb-3" placeholder="Search..." oninput="filterGames(this.value, 'img')">
@@ -95,14 +101,20 @@
       games.forEach((game, index) => {
         descList.innerHTML += `
           <div class="game-item">
-            <strong>${game.name}</strong><br>
-            <textarea class="form-control" onchange="updateGame(${index}, 'description', this.value)">${game.description}</textarea>
+            <div class="game-item-content">
+              <strong>${game.name}</strong><br>
+              <textarea class="form-control" onchange="updateGame(${index}, 'description', this.value)">${game.description}</textarea>
+            </div>
+            <button class="btn btn-danger btn-sm delete-btn" onclick="deleteGame(${index})">Delete</button>
           </div>`;
 
         imgList.innerHTML += `
           <div class="game-item">
-            <strong>${game.name}</strong><br>
-            <input class="form-control" value="${game.image}" onchange="updateGame(${index}, 'image', this.value)">
+            <div class="game-item-content">
+              <strong>${game.name}</strong><br>
+              <input class="form-control" value="${game.image}" onchange="updateGame(${index}, 'image', this.value)">
+            </div>
+            <button class="btn btn-danger btn-sm delete-btn" onclick="deleteGame(${index})">Delete</button>
           </div>`;
       });
     }
@@ -135,6 +147,14 @@
         });
     }
 
+    function deleteGame(index) {
+      fetch(`/games/${index}`, {
+        method: 'DELETE'
+      }).then(res => {
+        if (res.ok) fetchGames();
+      });
+    }
+
     function filterGames(query, type) {
       query = query.toLowerCase();
       const list = type === 'desc' ? 'desc-list' : 'img-list';
@@ -142,19 +162,17 @@
       container.innerHTML = '';
       games.forEach((game, index) => {
         if (game.name.toLowerCase().includes(query)) {
-          if (type === 'desc') {
-            container.innerHTML += `
-              <div class="game-item">
+          const content = type === 'desc' ?
+            `<textarea class="form-control" onchange="updateGame(${index}, 'description', this.value)">${game.description}</textarea>` :
+            `<input class="form-control" value="${game.image}" onchange="updateGame(${index}, 'image', this.value)">`;
+          container.innerHTML += `
+            <div class="game-item">
+              <div class="game-item-content">
                 <strong>${game.name}</strong><br>
-                <textarea class="form-control" onchange="updateGame(${index}, 'description', this.value)">${game.description}</textarea>
-              </div>`;
-          } else {
-            container.innerHTML += `
-              <div class="game-item">
-                <strong>${game.name}</strong><br>
-                <input class="form-control" value="${game.image}" onchange="updateGame(${index}, 'image', this.value)">
-              </div>`;
-          }
+                ${content}
+              </div>
+              <button class="btn btn-danger btn-sm delete-btn" onclick="deleteGame(${index})">Delete</button>
+            </div>`;
         }
       });
     }
